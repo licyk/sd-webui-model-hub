@@ -1,6 +1,6 @@
 # SD WebUI Model Hub
 
-Stable Diffusion WebUI（A1111）和 Forge 的模型管理、下载扩展，使用 `sd-model-hub>=0.1.3`。
+Stable Diffusion WebUI（A1111）和 Forge 的模型管理、下载扩展，使用 `sd-model-hub>=0.1.4`。
 
 扩展在 **Model Hub** 标签页中嵌入 sd-model-hub 的原生界面，提供模型来源搜索、直链下载、Hugging Face / ModelScope 仓库下载、下载队列，以及本地模型浏览、识别、移动、重命名和删除。具体模型来源和下载能力由 sd-model-hub 提供。
 
@@ -75,7 +75,7 @@ node --check javascript/model_hub.js
 node --test tests/test_panel.mjs
 ```
 
-测试覆盖目录映射、版本判断、两种 Gradio 会话、API-only 认证、挂载子路径、Socket.IO、真实下载工作线程、宿主变更通知、简化的嵌入界面及生命周期清理。测试使用临时目录和模拟的 HTTP 模型源，不读取或下载真实模型权重。
+测试覆盖目录映射、两种 Gradio 会话、API-only 认证、挂载子路径、Socket.IO、真实下载工作线程、宿主变更通知、简化的嵌入界面及生命周期清理。测试使用临时目录和模拟的 HTTP 模型源，不读取或下载真实模型权重。
 
 子应用在首次已认证请求时，于 WebUI 当前事件循环中启动。标准宿主 shutdown、服务器事件循环退出和脚本卸载均有清理路径，以适配 Forge 在服务器启动后才调用 `on_app_started` 的时序。
 
