@@ -1,0 +1,5 @@
+#sd-model-hub-panel { width: 100%; }
+#sd-model-hub-panel .model-hub-status { margin: 0.6rem 0; font-size: 0.9rem; }
+#sd-model-hub-panel .model-hub-status[hidden] { display: none; }
+#sd-model-hub-panel .model-hub-frame { width: 100%; height: max(600px, 78vh); border: 1px solid var(--border-color-primary, #888); border-radius: 0.5rem; background: var(--body-background-fill, #fff); }
+#sd-model-hub-panel .model-hub-frame[hidden] { display: none; }
