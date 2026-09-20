@@ -64,8 +64,8 @@ def create_factory(shared, paths, demo, loaded=None):
         from sd_model_hub.core.context import build_services
         from sd_model_hub.version import VERSION as HUB_VERSION
 
-        if Version(HUB_VERSION) < Version("0.1.4"):
-            raise RuntimeError(f"sd-model-hub>=0.1.4 required; found {HUB_VERSION}")
+        if Version(HUB_VERSION) < Version("0.1.5"):
+            raise RuntimeError(f"sd-model-hub>=0.1.5 required; found {HUB_VERSION}")
         cmd = shared.cmd_opts
         settings = shared.opts.data
         public_url = validate_public_base_url(settings.get("model_hub_public_url") or None)
