@@ -19,6 +19,7 @@ from sd_webui_model_hub.roots import collect_roots
 from sd_webui_model_hub.runtime import HubRuntime
 
 logger = logging.getLogger(__name__)
+DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 
 if TYPE_CHECKING:
     from sd_model_hub.core.context import Services
@@ -72,10 +73,9 @@ def create_factory(shared, paths, demo, loaded=None):
         port = getattr(demo, "server_port", None) or getattr(cmd, "port", None) or 7860
         extra_hosts = {urlsplit(public_url).hostname} if public_url else set()
         roots = collect_roots(shared, paths, loaded)
-        data_dir = Path(paths.data_path) / "model-hub"
         services = build_services(
-            data_dir=data_dir,
-            settings_path=data_dir / "settings.toml",
+            data_dir=DATA_DIR,
+            settings_path=DATA_DIR / "settings.toml",
             roots_locked=True,
             settings_overrides={
                 "paths": {"model_roots": roots.roots},
@@ -97,6 +97,7 @@ def create_factory(shared, paths, demo, loaded=None):
                         "hub_version": HUB_VERSION,
                         "host": "Forge" if "modules_forge.main_entry" in loaded or "modules_forge.shared" in loaded else "A1111",
                         "roots": roots.roots,
+                        "default_library_root": roots.default_library_root,
                         "ui_available": (web_dist_dir() / "index.html").is_file(),
                         "auto_refresh": bool(shared.opts.data.get("model_hub_auto_refresh", True)),
                         "busy": bool(getattr(state, "job_count", 0) > 0 or getattr(state, "job", "")),

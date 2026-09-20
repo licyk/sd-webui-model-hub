@@ -13,7 +13,7 @@ async function panel() {
     let httpStatus = 200;
     let failure = null;
     const timers = new Map();
-    const state = {instance: "server", revision: 0, busy: false, auto_refresh: true, ui_available: true};
+    const state = {instance: "server", revision: 0, busy: false, auto_refresh: true, ui_available: true, default_library_root: "all-models"};
     const status = {hidden: true, textContent: ""};
     const frame = {
         hidden: true,
@@ -43,6 +43,7 @@ async function panel() {
         document: root,
         onUiLoaded: (fn) => { boot = fn; },
         URL,
+        URLSearchParams,
         AbortController,
         setTimeout: (fn, delay) => { const id = ++sequence; timers.set(id, {fn, delay}); return id; },
         clearTimeout: (id) => timers.delete(id),
@@ -70,10 +71,17 @@ async function panel() {
 test("connected panel shows the iframe without connection or folder information", async () => {
     const ui = await panel();
     assert.equal(ui.frame.hidden, false);
-    assert.equal(ui.frame.src, "https://example.test/webui/sd-model-hub/");
+    assert.equal(ui.frame.src, "https://example.test/webui/sd-model-hub/#/library?root=all-models");
     assert.equal(ui.status.hidden, true);
     assert.equal(ui.status.textContent, "");
     assert.equal(ui.refreshes(), 0);
+});
+
+test("status polling preserves the directory chosen after opening the library", async () => {
+    const ui = await panel();
+    ui.frame.src = "https://example.test/webui/sd-model-hub/#/library?root=loras&path=styles";
+    await ui.poll();
+    assert.equal(ui.frame.src, "https://example.test/webui/sd-model-hub/#/library?root=loras&path=styles");
 });
 
 test("automatic refresh waits silently until generation is idle", async () => {
@@ -108,6 +116,7 @@ test("expired login hides the iframe and recovery clears the error", async () =>
     await ui.poll();
     assert.equal(ui.frame.hidden, false);
     assert.equal(ui.status.hidden, true);
+    assert.equal(ui.frame.src, "https://example.test/webui/sd-model-hub/#/library?root=all-models");
 });
 
 test("missing assets and connection errors remain visible until recovery", async () => {

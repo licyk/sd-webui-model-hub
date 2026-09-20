@@ -143,6 +143,7 @@ def test_complete_model_directory_browses_unregistered_folders(host, dist):
             roots = client.get("/api/v1/library/roots").json()
             complete = next(r for r in roots if r["path"] == str(models))
             assert complete["kind"] is None
+            assert client.get("/_host/status").json()["default_library_root"] == complete["id"]
             url = f"/api/v1/library/roots/{complete['id']}/entries"
             listing = client.get(url, params={"kind": "lora"}).json()
             assert [folder["path"] for folder in listing["folders"]] == ["custom-kind"]
@@ -152,5 +153,29 @@ def test_complete_model_directory_browses_unregistered_folders(host, dist):
             destination = client.get("/api/v1/library/destination", params={"kind": "lora"}).json()
             assert next(r["path"] for r in roots if r["id"] == destination["root_id"]) == shared.cmd_opts.lora_dir
             assert destination["rel_dir"] == ""
+    finally:
+        resources.close()
+
+
+def test_settings_persist_in_extension_data_directory(host, dist, tmp_path):
+    shared, paths = host
+    data_dir = tmp_path / "extension" / "data"
+    factory = create_factory(shared, paths, None, {})
+    resources, app = factory()
+    try:
+        with TestClient(app, base_url="http://localhost") as client:
+            response = client.patch("/api/v1/settings", json={"downloads": {"write_webui_metadata": True}})
+            assert response.status_code == 200, response.text
+            assert resources.services.settings.data_dir == data_dir
+            assert resources.services.settings.path == data_dir / "settings.toml"
+            assert (data_dir / "settings.toml").is_file()
+            assert (data_dir / "sd-model-hub.db").is_file()
+            assert not (Path(paths.data_path) / "model-hub").exists()
+    finally:
+        resources.close()
+
+    resources, _app = factory()
+    try:
+        assert resources.services.settings.settings.downloads.write_webui_metadata is True
     finally:
         resources.close()

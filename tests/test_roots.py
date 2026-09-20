@@ -68,6 +68,7 @@ def test_complete_model_directory_preserves_download_destinations(host):
     complete = next(r for r in roots.roots if r["path"] == str(Path(paths.models_path).resolve()))
     assert complete["name"] == "全部模型目录"
     assert complete["layout"] == "sd-webui" and complete["kind"] is None
+    assert roots.default_library_root == complete["id"]
     assert roots.roots[0]["path"] == str(Path(paths.models_path) / "Stable-diffusion")
     assert destination_path(roots, "checkpoint") == shared.cmd_opts.ckpt_dir
     assert destination_path(roots, "lora") == shared.cmd_opts.lora_dir
@@ -84,4 +85,5 @@ def test_complete_directory_merges_with_existing_custom_destination(host):
     assert len(entries) == 1
     assert entries[0]["name"] == "全部模型目录"
     assert entries[0]["kind"] is None and entries[0]["layout"] == "sd-webui"
+    assert roots.default_library_root == entries[0]["id"]
     assert roots.destinations["checkpoint"] == {"root_id": entries[0]["id"], "rel_dir": ""}

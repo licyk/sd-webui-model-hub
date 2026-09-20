@@ -10,8 +10,9 @@ from pathlib import Path
 class HostRoots:
     roots: list[dict] = field(default_factory=list)
     destinations: dict[str, dict] = field(default_factory=dict)
+    default_library_root: str | None = None
 
-    def add(self, path, name: str, kind: str | None, preferred: bool = False, *, layout: str = "custom") -> None:
+    def add(self, path, name: str, kind: str | None, preferred: bool = False, *, layout: str = "custom") -> str | None:
         if not path:
             return
         path = str(Path(path).expanduser().resolve())
@@ -32,6 +33,7 @@ class HostRoots:
             existing["kind"] = None
         if kind is not None and (preferred or kind not in self.destinations):
             self.destinations[kind] = {"root_id": existing["id"], "rel_dir": ""}
+        return existing["id"]
 
 
 def collect_roots(shared, paths, loaded: dict) -> HostRoots:
@@ -77,5 +79,5 @@ def collect_roots(shared, paths, loaded: dict) -> HostRoots:
         roots.add(getattr(scaler, "user_path", None), name + " (custom)", "upscaler", preferred)
     # Register the complete host directory without replacing per-kind download destinations
     # or the existing first-root fallback for downloads whose kind is unknown.
-    roots.add(models, "全部模型目录", None, layout="sd-webui")
+    roots.default_library_root = roots.add(models, "全部模型目录", None, layout="sd-webui")
     return roots

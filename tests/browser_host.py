@@ -14,6 +14,7 @@ from sd_model_hub.api import app as hub_app
 from sd_model_hub.api import static
 from sd_model_hub.core.events.models import LibraryChangedEvent
 
+from sd_webui_model_hub import host as host_module
 from sd_webui_model_hub.host import mount_hub, on_ui_tabs
 
 
@@ -23,6 +24,7 @@ def main():
     parser.add_argument("--dist", type=Path, required=True)
     parser.add_argument("--port", type=int, default=17863)
     args = parser.parse_args()
+    host_module.DATA_DIR = args.data_dir / "extension" / "data"
     static.web_dist_dir = lambda: args.dist
     hub_app.web_dist_dir = lambda: args.dist
     root = Path(__file__).resolve().parents[1]

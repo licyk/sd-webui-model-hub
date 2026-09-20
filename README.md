@@ -6,17 +6,15 @@ Stable Diffusion WebUI（A1111）和 Forge 的模型管理、下载扩展，使�
 
 ## 安装
 
-将本目录放在 WebUI 的 `extensions/sd-webui-model-hub` 下，然后完整重启 WebUI。
+1. 打开 WebUI 的 **扩展（Extensions）→ 从网址安装（Install from URL）**。
+2. 输入 Git 仓库地址 `https://github.com/licyk/sd-webui-model-hub.git`，点击安装。
+3. 完整重启 WebUI，依赖会自动安装，随后打开 **Model Hub** 标签页。
 
-`install.py` 会通过 WebUI 的 `launch.run_pip` 安装 `requirements.txt` 中的依赖。安装和运行均使用 **WebUI 自身的 Python 环境**。满足版本要求时不会重复安装；不主动升级其他宿主依赖。使用 `--skip-install` 时，需要自行在同一环境安装依赖。
-
-依赖发行包必须包含 `sd_model_hub/webui/dist`。如果从 sd-model-hub 源码安装，先按该库说明构建前端，再用 WebUI 的 Python 安装源码目录；本扩展不另行构建或复制 Vue 界面。缺少前端资源时，标签页会显示提示。
-
-本扩展要求 Python 3.10 或更新版本。
+需要 Python 3.10 或更新版本。
 
 ## 使用
 
-1. 打开 **Model Hub** 标签页，直接使用模型管理界面；在“本地模型”中选择模型目录。
+1. 打开 **Model Hub** 标签页，默认进入“本地模型”的“全部模型目录”；需要时可切换到其他分类目录。
 2. 在原生界面搜索模型、选择仓库文件或输入下载链接。已识别的模型类型会推荐对应目录；无法识别的直链文件请手动选择目录。
 3. 默认在下载完成或本地模型变化后自动刷新 WebUI 的模型列表，生成任务进行中会等待空闲。
 
@@ -30,6 +28,7 @@ Stable Diffusion WebUI（A1111）和 Forge 的模型管理、下载扩展，使�
 扩展读取宿主运行时配置，而不是假定所有模型都在默认 `models` 文件夹：
 
 本地模型的根目录下拉框还提供“全部模型目录”，指向宿主实际的 `models_path`。
+每次重新加载扩展界面时默认打开此目录，不受上次选择的分类目录影响；进入后手动切换的目录不会被后台轮询重置。
 便携包使用重定向后的模型目录，可从此入口逐级浏览所有子目录，包括未注册的自定义分类。
 原有分类入口和各类型的下载位置保持有效；根目录外的自定义模型路径仍通过各自入口访问。
 
@@ -47,7 +46,7 @@ Stable Diffusion WebUI（A1111）和 Forge 的模型管理、下载扩展，使�
 
 重复目录（包括指向同一位置的符号链接）合并，目录 ID 在重启后保持稳定。目录列表由宿主管理，在 Model Hub 中锁定；修改 WebUI 启动参数或目录配置后应完整重启。类型提示不会覆盖 sd-model-hub 的文件识别结果。目录接入不代表宿主能够加载任意模型架构。
 
-扩展数据保存在 `<WebUI data_path>/model-hub/`，包括 `settings.toml`、数据库、下载记录和缓存；模型文件直接写入上述模型目录。是否生成 WebUI 模型侧车元数据可在 sd-model-hub 的下载设置中启用。
+扩展数据保存在扩展目录下的 `data/`，包括 `settings.toml`、数据库、下载记录和缓存；该目录已通过 `.gitignore` 忽略。模型文件直接写入上述模型目录。是否生成 WebUI 模型侧车元数据可在 sd-model-hub 的下载设置中启用。
 
 ## 设置与部署
 

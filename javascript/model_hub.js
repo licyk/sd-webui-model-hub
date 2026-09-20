@@ -70,7 +70,11 @@
                     return;
                 }
                 if (!frame.hasAttribute("src")) {
-                    frame.src = base.href;
+                    const initial = new URL(base);
+                    if (latest.default_library_root) {
+                        initial.hash = `/library?${new URLSearchParams({root: latest.default_library_root})}`;
+                    }
+                    frame.src = initial.href;
                 }
                 frame.hidden = false;
                 message();

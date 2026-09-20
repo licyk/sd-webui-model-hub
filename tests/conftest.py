@@ -2,9 +2,12 @@ from types import SimpleNamespace
 
 import pytest
 
+from sd_webui_model_hub import host as host_module
+
 
 @pytest.fixture
-def host(tmp_path):
+def host(tmp_path, monkeypatch):
+    monkeypatch.setattr(host_module, "DATA_DIR", tmp_path / "extension" / "data")
     shared = SimpleNamespace(
         cmd_opts=SimpleNamespace(
             ckpt_dir=str(tmp_path / "custom-checkpoints"),

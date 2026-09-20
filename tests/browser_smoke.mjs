@@ -23,11 +23,10 @@ try {
     await page.goto(base);
     const frame = page.frameLocator(".model-hub-frame");
     await frame.locator("#app").waitFor();
-    await frame.getByRole("link", {name: "Library", exact: true}).click();
     await frame.locator(".root-path").waitFor();
-    assert.match(await frame.locator(".root-path").textContent(), /Stable-diffusion/);
-    assert.ok(await frame.getByText("LoRA", {exact: true}).count() > 0);
-    assert.equal(await page.locator(".model-hub-frame").getAttribute("src"), `${base}/sd-model-hub/`);
+    assert.match(await frame.locator(".root-path").textContent(), /[/\\]models$/);
+    const hostStatus = await (await context.request.get(`${base}/sd-model-hub/_host/status`)).json();
+    assert.equal(await page.locator(".model-hub-frame").getAttribute("src"), `${base}/sd-model-hub/#/library?root=${hostStatus.default_library_root}`);
     assert.equal(await page.locator('#sd-model-hub-panel [data-action], .model-hub-toolbar, .model-hub-folders').count(), 0);
     assert.equal(await page.locator(".model-hub-status").isVisible(), false);
     const before = Number(await page.locator("#smoke-counter textarea").inputValue());
@@ -44,8 +43,8 @@ try {
     await page.waitForFunction((old) => Number(document.querySelector("#smoke-counter textarea")?.value) > old, idleCount, {timeout: 15000});
     await page.reload();
     await frame.locator("#app").waitFor();
-    await frame.getByRole("link", {name: "Library", exact: true}).click();
     await frame.locator(".root-path").waitFor();
+    assert.match(await frame.locator(".root-path").textContent(), /[/\\]models$/);
     await page.screenshot({path: process.env.MODEL_HUB_SCREENSHOT || "/tmp/sd-webui-model-hub-smoke.png", fullPage: true});
     assert.deepEqual(errors, []);
     await context.clearCookies();
