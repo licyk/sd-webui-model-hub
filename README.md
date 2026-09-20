@@ -1,6 +1,6 @@
 # SD WebUI Model Hub
 
-Stable Diffusion WebUI（A1111）和 Forge 的模型管理、下载扩展，使用 `sd-model-hub>=0.1.1,<0.2`。
+Stable Diffusion WebUI（A1111）和 Forge 的模型管理、下载扩展，使用 `sd-model-hub>=0.1.2`。
 
 扩展在 **Model Hub** 标签页中嵌入 sd-model-hub 的原生界面，提供模型来源搜索、直链下载、Hugging Face / ModelScope 仓库下载、下载队列，以及本地模型浏览、识别、移动、重命名和删除。具体模型来源和下载能力由 sd-model-hub 提供。
 

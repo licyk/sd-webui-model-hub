@@ -157,6 +157,21 @@ def test_complete_model_directory_browses_unregistered_folders(host, dist):
         resources.close()
 
 
+@pytest.mark.parametrize("version", ["0.1.1", "0.1.2", "0.2.0", "1.0.0"])
+def test_runtime_dependency_version_requirement(host, dist, monkeypatch, version):
+    from sd_model_hub import version as hub_version
+
+    monkeypatch.setattr(hub_version, "VERSION", version)
+    shared, paths = host
+    factory = create_factory(shared, paths, None, {})
+    if version == "0.1.1":
+        with pytest.raises(RuntimeError, match=r"sd-model-hub>=0\.1\.2 required"):
+            factory()
+    else:
+        resources, _app = factory()
+        resources.close()
+
+
 def test_settings_persist_in_extension_data_directory(host, dist, tmp_path):
     shared, paths = host
     data_dir = tmp_path / "extension" / "data"
