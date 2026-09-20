@@ -6,10 +6,10 @@ import pytest
 from sd_webui_model_hub import installer
 
 
-@pytest.mark.parametrize("installed,needs_install", [("0.1.2", False), ("0.1.10", False), ("0.1.1", True), ("0.2.0", False), ("1.0.0", False), (None, True)])
+@pytest.mark.parametrize("installed,needs_install", [("0.1.3", False), ("0.1.10", False), ("0.1.2", True), ("0.2.0", False), ("1.0.0", False), (None, True)])
 def test_semantic_versions_and_missing_package(tmp_path, monkeypatch, installed, needs_install):
     path = tmp_path / "requirements.txt"
-    path.write_text('# comment\n\nsd-model-hub>=0.1.2\nnot-needed; python_version < "3.0"\n')
+    path.write_text('# comment\n\nsd-model-hub>=0.1.3\nnot-needed; python_version < "3.0"\n')
 
     def version(_name):
         if installed is None:
