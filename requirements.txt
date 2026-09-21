@@ -1,1 +1,1 @@
-sd-model-hub>=0.1.5
+sd-model-hub>=0.1.8

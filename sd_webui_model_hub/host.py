@@ -57,15 +57,12 @@ def create_factory(shared, paths, demo, loaded=None):
     loaded = sys.modules if loaded is None else loaded
 
     def factory():
-        from packaging.version import Version
         from sd_model_hub.api.app import create_app
         from sd_model_hub.api.paths import validate_public_base_url
         from sd_model_hub.api.static import web_dist_dir
         from sd_model_hub.core.context import build_services
         from sd_model_hub.version import VERSION as HUB_VERSION
 
-        if Version(HUB_VERSION) < Version("0.1.5"):
-            raise RuntimeError(f"sd-model-hub>=0.1.5 required; found {HUB_VERSION}")
         cmd = shared.cmd_opts
         settings = shared.opts.data
         public_url = validate_public_base_url(settings.get("model_hub_public_url") or None)

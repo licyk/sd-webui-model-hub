@@ -1,71 +1,85 @@
 # SD WebUI Model Hub
 
-Stable Diffusion WebUI（A1111）和 Forge 的模型管理、下载扩展，使用 `sd-model-hub>=0.1.5`。
+English | [简体中文](README_zh-CN.md)
 
-扩展在 **Model Hub** 标签页中嵌入 sd-model-hub 的原生界面，提供模型来源搜索、直链下载、Hugging Face / ModelScope 仓库下载、下载队列，以及本地模型浏览、识别、移动、重命名和删除。具体模型来源和下载能力由 sd-model-hub 提供。
+A model management and download extension for Stable Diffusion WebUI (A1111) and Forge, powered by sd-model-hub.
 
-## 安装
+The extension embeds the native sd-model-hub interface in the **Model Hub** tab. It supports searching model sources, downloading from direct links and Hugging Face / ModelScope repositories, managing download queues, and browsing, identifying, moving, renaming, and deleting local models. Available model sources and download capabilities are provided by sd-model-hub.
 
-1. 打开 WebUI 的 **扩展（Extensions）→ 从网址安装（Install from URL）**。
-2. 输入 Git 仓库地址 `https://github.com/licyk/sd-webui-model-hub.git`，点击安装。
-3. 完整重启 WebUI，依赖会自动安装，随后打开 **Model Hub** 标签页。
+## Installation
 
-需要 Python 3.10 或更新版本。
+Requires Python 3.10 or newer.
 
-## 使用
+### Option 1: Install through WebUI
 
-1. 打开 **Model Hub** 标签页，默认进入“本地模型”的“全部模型目录”；需要时可切换到其他分类目录。
-2. 在原生界面搜索模型、选择仓库文件或输入下载链接。已识别的模型类型会推荐对应目录；无法识别的直链文件请手动选择目录。
-3. 默认在下载完成或本地模型变化后自动刷新 WebUI 的模型列表，生成任务进行中会等待空闲。
+1. Open **Extensions → Install from URL** in WebUI.
+2. Enter `https://github.com/licyk/sd-webui-model-hub.git` and click **Install**.
+3. Fully restart WebUI. Dependencies will be installed automatically, and the **Model Hub** tab will become available.
 
-刷新通过宿主已有的 Gradio 按钮进行，覆盖 Checkpoint、VAE、Extra Networks 和可用的 ControlNet 控件。每个浏览器页面独立接收更新，不自动选择或加载下载的模型。没有对应刷新控件的组件，以及部分放大模型，需要手动刷新或重启 WebUI。
+### Option 2: Install from the command line
 
-标签页直接显示 Model Hub 界面，不附加工具栏、连接成功提示或模型目录路径。连接失败、登录失效或缺少前端资源时才显示错误提示。
-独立访问原生界面也沿用 WebUI 登录；自动刷新宿主选择列表需要保留一个 WebUI 页面。
+Open a terminal in the WebUI root directory (the directory containing the `extensions` folder) and run:
 
-## 模型目录
+```bash
+git clone https://github.com/licyk/sd-webui-model-hub.git extensions/sd-webui-model-hub
+```
 
-扩展读取宿主运行时配置，而不是假定所有模型都在默认 `models` 文件夹：
+Start or fully restart WebUI after installation. Dependencies will be installed automatically, and the **Model Hub** tab will become available.
 
-本地模型的根目录下拉框还提供“全部模型目录”，指向宿主实际的 `models_path`。
-每次重新加载扩展界面时默认打开此目录，不受上次选择的分类目录影响；进入后手动切换的目录不会被后台轮询重置。
-便携包使用重定向后的模型目录，可从此入口逐级浏览所有子目录，包括未注册的自定义分类。
-原有分类入口和各类型的下载位置保持有效；根目录外的自定义模型路径仍通过各自入口访问。
+## Usage
 
-| 模型类型 | 目录来源 |
+1. Open the **Model Hub** tab. It opens the local library at **All model directories** by default; switch to a category directory when needed.
+2. Search for models, select repository files, or enter a download URL in the embedded interface. Recognized model types suggest a matching destination; choose a directory manually for unrecognized files downloaded from direct links.
+3. By default, WebUI model lists refresh automatically after downloads finish or local models change. Refreshes wait until any active generation task finishes.
+
+Refreshes use the host's existing Gradio buttons for Checkpoints, VAEs, Extra Networks, and available ControlNet controls. Each browser page receives updates independently. Downloaded models are not selected or loaded automatically. Components without a matching refresh control, and some upscalers, require a manual refresh or a WebUI restart.
+
+The tab displays the Model Hub interface directly, without an extra toolbar, connection success message, or model directory paths. Error messages appear only when the connection fails, authentication expires, or frontend assets are missing.
+Opening the native interface separately also uses WebUI authentication. Keep a WebUI page open to receive automatic updates to the host's model lists.
+
+## Model directories
+
+The extension reads the host's runtime configuration instead of assuming that all models live in the default `models` folder.
+
+The local library's root selector includes **All model directories**, which points to the host's actual `models_path`.
+Reloading the extension interface always opens this directory, regardless of the previously selected category. After opening it, manually selected directories are not reset by background polling.
+Portable installations use the redirected model directory. This entry lets you browse all its subdirectories, including unregistered custom categories.
+Existing category entries and download destinations remain available. Custom model paths outside this root are still accessible through their own entries.
+
+| Model type | Directory source |
 | --- | --- |
-| Checkpoint | `sd_models.model_path` 和 `--ckpt-dir`；自定义目录优先用于下载 |
-| VAE | 默认 VAE 目录和 `--vae-dir` |
-| LoRA / LyCORIS | `--lora-dir`、`--lyco-dir-backcompat` |
-| Embedding / Hypernetwork | `--embeddings-dir`、`--hypernetwork-dir` |
-| Forge diffusion model | 使用 Checkpoint 下载目录 |
-| Forge text encoder | `models/text_encoder` 和 `--text-encoder-dir` |
-| ControlNet | 已加载的 ControlNet / Forge 模块目录、启动参数和额外目录设置 |
-| Forge preprocessor | Forge 的实际预处理器目录 |
-| Upscaler | 已注册放大器的模型目录和自定义目录 |
+| Checkpoint | `sd_models.model_path` and `--ckpt-dir`; the custom directory takes priority for downloads |
+| VAE | Default VAE directory and `--vae-dir` |
+| LoRA / LyCORIS | `--lora-dir`, `--lyco-dir-backcompat` |
+| Embedding / Hypernetwork | `--embeddings-dir`, `--hypernetwork-dir` |
+| Forge diffusion model | Uses the Checkpoint download directory |
+| Forge text encoder | `models/text_encoder` and `--text-encoder-dir` |
+| ControlNet | Directories from loaded ControlNet / Forge modules, launch arguments, and additional directory settings |
+| Forge preprocessor | Forge's actual preprocessor directory |
+| Upscaler | Model directories of registered upscalers and custom directories |
 
-重复目录（包括指向同一位置的符号链接）合并，目录 ID 在重启后保持稳定。目录列表由宿主管理，在 Model Hub 中锁定；修改 WebUI 启动参数或目录配置后应完整重启。类型提示不会覆盖 sd-model-hub 的文件识别结果。目录接入不代表宿主能够加载任意模型架构。
+Duplicate directories, including symbolic links to the same location, are merged. Directory IDs remain stable across restarts. The host manages the directory list, which is locked in Model Hub; fully restart WebUI after changing launch arguments or directory settings. Type hints do not override sd-model-hub's file identification results. Registering a directory does not mean the host can load every model architecture.
 
-扩展数据保存在扩展目录下的 `data/`，包括 `settings.toml`、数据库、下载记录和缓存；该目录已通过 `.gitignore` 忽略。模型文件直接写入上述模型目录。是否生成 WebUI 模型侧车元数据可在 sd-model-hub 的下载设置中启用。
+Extension data is stored in `data/` inside the extension directory, including `settings.toml`, the database, download history, and caches. This directory is excluded by `.gitignore`. Model files are saved directly to the model directories above. WebUI model sidecar metadata can be enabled in sd-model-hub's download settings.
 
-## 设置与部署
+## Settings and deployment
 
-WebUI **Settings → SD Model Hub** 提供：
+WebUI **Settings → SD Model Hub** provides:
 
-- 下载完成或模型变化后自动刷新 WebUI 模型列表。
-- 反向代理外部地址，用于 OAuth。例如 `https://example.com/webui/sd-model-hub`，必须包含 WebUI 子路径及扩展路径；修改后完整重启。OAuth 客户端配置仍在 sd-model-hub 中设置。
+- Automatic refresh of WebUI model lists after downloads finish or models change.
+- An external reverse proxy URL for OAuth, such as `https://example.com/webui/sd-model-hub`. It must include both the WebUI subpath and the extension path. Fully restart WebUI after changing it. OAuth client settings are still configured in sd-model-hub.
 
-服务在 WebUI 原有 HTTP 服务的 `/sd-model-hub/` 下运行，不启动第二个 HTTP 服务。使用 WebUI 子路径时，浏览器地址为 `<WebUI 子路径>/sd-model-hub/`。反向代理需要同时转发该路径下的 HTTP 和 WebSocket。
+The service runs under `/sd-model-hub/` on WebUI's existing HTTP server; it does not start a second HTTP server. When WebUI uses a subpath, the browser URL is `<WebUI subpath>/sd-model-hub/`. Reverse proxies must forward both HTTP and WebSocket traffic under this path.
 
-开启 Gradio 登录时，整个扩展（包括静态页面、API 和 WebSocket）校验宿主会话，兼容 Gradio 3 和 4 的 cookie 格式。不单独要求 sd-model-hub token。API-only 模式沿用 `--api-auth` 的 HTTP Basic 登录。普通图形界面模式使用 Gradio 登录，`--api-auth` 不替代图形界面的认证。
+When Gradio login is enabled, the entire extension, including static pages, APIs, and WebSockets, validates the host session. Both Gradio 3 and 4 cookie formats are supported. No separate sd-model-hub token is required. API-only mode uses HTTP Basic authentication from `--api-auth`. The regular graphical interface uses Gradio login; `--api-auth` does not replace authentication for the graphical interface.
 
-扩展提供与本机模型管理相同的文件操作权限，适合受信任的 WebUI 用户。锁定模型根目录仅用于宿主目录配置，不是文件系统沙箱；sd-model-hub 本身允许显式下载路径和本地导入。
+The extension grants the same file operation permissions as local model management and is intended for trusted WebUI users. Locked model roots control host directory configuration; they are not a filesystem sandbox. sd-model-hub itself allows explicit download paths and local imports.
 
-## 开发与验证
+## Development and validation
 
-`scripts/model_hub_setup.py` 注册 WebUI 回调，`sd_webui_model_hub/` 负责宿主适配，`javascript/model_hub.js` 负责 iframe 和刷新控件。不会修改宿主或 sd-model-hub 源文件。
+`scripts/model_hub_setup.py` registers WebUI callbacks, `sd_webui_model_hub/` adapts the host, and `javascript/model_hub.js` handles the iframe and refresh controls. The extension does not modify host or sd-model-hub source files.
 
-安装开发依赖后，在能导入 sd-model-hub 的环境运行：
+After installing development dependencies, run these checks in an environment that can import sd-model-hub:
 
 ```bash
 python -m pytest -q
@@ -75,20 +89,20 @@ node --check javascript/model_hub.js
 node --test tests/test_panel.mjs
 ```
 
-测试覆盖目录映射、两种 Gradio 会话、API-only 认证、挂载子路径、Socket.IO、真实下载工作线程、宿主变更通知、简化的嵌入界面及生命周期清理。测试使用临时目录和模拟的 HTTP 模型源，不读取或下载真实模型权重。
+Tests cover directory mapping, both Gradio session formats, API-only authentication, mount subpaths, Socket.IO, real download workers, host change notifications, the minimal embedded interface, and lifecycle cleanup. They use temporary directories and simulated HTTP model sources without reading or downloading real model weights.
 
-子应用在首次已认证请求时，于 WebUI 当前事件循环中启动。标准宿主 shutdown、服务器事件循环退出和脚本卸载均有清理路径，以适配 Forge 在服务器启动后才调用 `on_app_started` 的时序。
+The sub-application starts in WebUI's current event loop on the first authenticated request. Cleanup handles normal host shutdown, server event loop exit, and script unloading, including Forge's behavior of calling `on_app_started` after the server starts.
 
-可选浏览器检查需要 Gradio 4、Playwright / Chromium 和已构建的 sd-model-hub 前端。测试夹具使用临时目录，不加载 Stable Diffusion：
+Optional browser checks require Gradio 4, Playwright / Chromium, and a built sd-model-hub frontend. The test fixture uses temporary directories and does not load Stable Diffusion:
 
 ```bash
 PYTHONPATH=. python tests/browser_host.py --data-dir /tmp/model-hub-test --dist /path/to/sd_model_hub/webui/dist
-# 在另一个终端运行，检查完成后用 Ctrl+C 停止夹具：
+# Run in another terminal, then stop the fixture with Ctrl+C after checking:
 node tests/browser_smoke.mjs
 ```
 
-夹具仅监听 `127.0.0.1:17863`，测试登录为 `smoke / smoke`。可通过 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`MODEL_HUB_TEST_URL` 指定现有测试工具和地址。
+The fixture listens only on `127.0.0.1:17863`, with test credentials `smoke / smoke`. Use `PLAYWRIGHT_MODULE`, `CHROMIUM_PATH`, and `MODEL_HUB_TEST_URL` to specify existing test tools and the target URL.
 
-## 协议
+## License
 
-本项目采用 [GNU GPLv3](LICENSE)。协议文件复制自 sd-webui-all-in-one 项目。
+This project is licensed under [GNU GPLv3](LICENSE).
