@@ -114,6 +114,32 @@ def create_factory(shared, paths, demo, loaded=None):
     return factory
 
 
+class SameOriginFrames:
+    """Let the WebUI page frame the hub even when a reverse proxy adds ``X-Frame-Options: DENY``.
+
+    Browsers ignore ``X-Frame-Options`` when a response carries a CSP ``frame-ancestors``
+    directive. A separate CSP header only adds restrictions, so any policy the proxy or hub
+    sends still applies.
+    """
+
+    header = (b"content-security-policy", b"frame-ancestors 'self'")
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        async def send_with_header(message):
+            if message["type"] == "http.response.start":
+                message = {**message, "headers": [*message.get("headers", []), self.header]}
+            await send(message)
+
+        await self.app(scope, receive, send_with_header)
+
+
 def mount_hub(demo, app, shared, paths):
     existing = getattr(app.state, "sd_webui_model_hub", None)
     if existing is not None:
@@ -123,7 +149,7 @@ def mount_hub(demo, app, shared, paths):
     runtime = HubRuntime(create_factory(shared, paths, demo))
     guarded = HostAuth(runtime, app, api_only=demo is None, api_auth=getattr(shared.cmd_opts, "api_auth", None))
     # Insert before any host catch-all route, without changing the host's middleware.
-    app.router.routes.insert(0, Mount(MOUNT_PATH, guarded, name="sd-webui-model-hub"))
+    app.router.routes.insert(0, Mount(MOUNT_PATH, SameOriginFrames(guarded), name="sd-webui-model-hub"))
     app.add_event_handler("shutdown", runtime.shutdown)
     app.state.sd_webui_model_hub = runtime
     return runtime

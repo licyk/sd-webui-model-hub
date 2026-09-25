@@ -40,13 +40,18 @@ def test_mount_after_startup_prefix_auth_roots_socket_and_shutdown(host, dist):
         runtime = mount_hub(SimpleNamespace(server_port=7860), parent, shared, paths)
         assert mount_hub(None, parent, shared, paths) is runtime
         assert runtime.task is None
-        assert client.get(f"{base}/_host/status").status_code == 401
+        denied = client.get(f"{base}/_host/status")
+        assert denied.status_code == 401
+        assert denied.headers["content-security-policy"] == "frame-ancestors 'self'"
         assert runtime.task is None  # Unauthenticated users cannot start workers.
         client.cookies.set("access-token-forge", "valid")
         status = client.get(f"{base}/_host/status")
         assert status.status_code == 200, status.text
         assert status.json()["ui_available"]
-        assert client.get(f"{base}/").text == '<script src="./assets/app.js"></script>'
+        page = client.get(f"{base}/")
+        assert page.text == '<script src="./assets/app.js"></script>'
+        # Overrides a proxy's X-Frame-Options: DENY so the WebUI tab can frame the hub.
+        assert page.headers["content-security-policy"] == "frame-ancestors 'self'"
         assert client.get(f"{base}/assets/app.js").status_code == 200
         assert client.get(f"{base}/api/v1/app/meta").json()["roots_locked"]
         assert client.get(f"{base}/api/v1/app/health").json()["auth_required"] is False
