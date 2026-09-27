@@ -71,8 +71,10 @@
                 }
                 if (!frame.hasAttribute("src")) {
                     const initial = new URL(base);
-                    if (latest.default_library_root) {
-                        initial.hash = `/library?${new URLSearchParams({root: latest.default_library_root})}`;
+                    // "*" is Hub's "All folders" entry; off, open the complete models directory.
+                    const initialRoot = latest.combined_view ? "*" : latest.default_library_root;
+                    if (initialRoot) {
+                        initial.hash = `/library?${new URLSearchParams({root: initialRoot})}`;
                     }
                     frame.src = initial.href;
                 }

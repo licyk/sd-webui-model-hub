@@ -28,7 +28,7 @@ git clone https://github.com/licyk/sd-webui-model-hub.git extensions/sd-webui-mo
 
 ## 使用
 
-1. 打开 **Model Hub** 标签页，默认进入“本地模型”的“全部模型目录”；需要时可切换到其他分类目录。
+1. 打开 **Model Hub** 标签页，默认进入“本地模型”的“All folders”（所有文件夹）；需要时可切换到单个目录。
 2. 在原生界面搜索模型、选择仓库文件或输入下载链接。已识别的模型类型会推荐对应目录；无法识别的直链文件请手动选择目录。
 3. 默认在下载完成或本地模型变化后自动刷新 WebUI 的模型列表，生成任务进行中会等待空闲。
 
@@ -41,22 +41,26 @@ git clone https://github.com/licyk/sd-webui-model-hub.git extensions/sd-webui-mo
 
 扩展读取宿主运行时配置，而不是假定所有模型都在默认 `models` 文件夹：
 
-本地模型的根目录下拉框还提供“全部模型目录”，指向宿主实际的 `models_path`。
-每次重新加载扩展界面时默认打开此目录，不受上次选择的分类目录影响；进入后手动切换的目录不会被后台轮询重置。
+本地模型的根目录下拉框以“All folders”（所有文件夹）开头，并列显示所有模型目录中的文件夹，包括 `models` 之外的额外目录。顶层直接存放模型文件的目录（如 `models/Lora`）会以其目录名显示为一个文件夹，使其中文件保持在一起；同名文件夹会标注所属目录。该视图由扩展固定开启，Model Hub 设置中的对应开关不可修改。
+每次重新加载扩展界面时默认打开“All folders”，不受上次选择的目录影响；进入后手动切换的目录不会被后台轮询重置。
+
+“全部模型目录”指向宿主实际的 `models_path`。
 便携包使用重定向后的模型目录，可从此入口逐级浏览所有子目录，包括未注册的自定义分类。
 原有分类入口和各类型的下载位置保持有效；根目录外的自定义模型路径仍通过各自入口访问。
 
 | 模型类型 | 目录来源 |
 | --- | --- |
-| Checkpoint | `sd_models.model_path` 和 `--ckpt-dir`；自定义目录优先用于下载 |
-| VAE | 默认 VAE 目录和 `--vae-dir` |
-| LoRA / LyCORIS | `--lora-dir`、`--lyco-dir-backcompat` |
+| Checkpoint | `sd_models.model_path`、`--ckpt-dir` 和 Forge Classic 的 `--ckpt-dirs`；自定义目录优先用于下载 |
+| VAE | 默认 VAE 目录、`--vae-dir` 和 `--vae-dirs` |
+| LoRA / LyCORIS | `--lora-dir`、`--lyco-dir-backcompat` 和 `--lora-dirs` |
 | Embedding / Hypernetwork | `--embeddings-dir`、`--hypernetwork-dir` |
 | Forge diffusion model | 使用 Checkpoint 下载目录 |
-| Forge text encoder | `models/text_encoder` 和 `--text-encoder-dir` |
-| ControlNet | 已加载的 ControlNet / Forge 模块目录、启动参数和额外目录设置 |
+| Forge text encoder | `models/text_encoder`、`--text-encoder-dir` 和 `--text-encoder-dirs` |
+| ControlNet | 已加载的 ControlNet / Forge 模块目录、启动参数（包括 `--controlnet-dirs`）和额外目录设置 |
 | Forge preprocessor | Forge 的实际预处理器目录 |
 | Upscaler | 已注册放大器的模型目录和自定义目录 |
+
+Forge Classic 可重复指定的 `--*-dirs` 参数（包括 `--forge-ref-a1111-home`、`--forge-ref-comfy-home` 和 `--forge-ref-comfy-yaml` 展开的目录）会显示为单独的“(extra)”入口。与宿主一致，不存在的目录会被跳过；这些目录只用于浏览，不作为下载位置。Stable Diffusion WebUI（A1111）没有这些参数，不受影响。
 
 重复目录（包括指向同一位置的符号链接）合并，目录 ID 在重启后保持稳定。目录列表由宿主管理，在 Model Hub 中锁定；修改 WebUI 启动参数或目录配置后应完整重启。类型提示不会覆盖 sd-model-hub 的文件识别结果。目录接入不代表宿主能够加载任意模型架构。
 

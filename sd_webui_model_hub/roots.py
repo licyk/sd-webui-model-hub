@@ -45,12 +45,23 @@ def collect_roots(shared, paths, loaded: dict) -> HostRoots:
     def attr(module, name, default=None):
         return getattr(loaded.get(module), name, default)
 
+    def add_extra(option, name, kind):
+        # Forge Classic scans repeatable --*-dirs in addition to its defaults, and expands
+        # --forge-ref-a1111-home, --forge-ref-comfy-home and --forge-ref-comfy-yaml into them.
+        # Like the host, skip missing directories; they never take the download destination.
+        existing = [d for d in getattr(cmd, option, None) or () if d and os.path.isdir(d)]
+        for index, directory in enumerate(existing):
+            roots.add(directory, f"{name} (extra)" if index == 0 else f"{name} (extra {index + 1})", kind)
+
     roots.add(attr("modules.sd_models", "model_path", models / "Stable-diffusion"), "Checkpoint", "checkpoint")
     roots.add(getattr(cmd, "ckpt_dir", None), "Checkpoint (custom)", "checkpoint", True)
+    add_extra("ckpt_dirs", "Checkpoint", "checkpoint")
     roots.add(attr("modules.sd_vae", "vae_path", models / "VAE"), "VAE", "vae")
     roots.add(getattr(cmd, "vae_dir", None), "VAE (custom)", "vae", True)
+    add_extra("vae_dirs", "VAE", "vae")
     roots.add(getattr(cmd, "lora_dir", None), "LoRA", "lora")
     roots.add(getattr(cmd, "lyco_dir_backcompat", None), "LyCORIS", "lora")
+    add_extra("lora_dirs", "LoRA", "lora")
     roots.add(getattr(cmd, "embeddings_dir", None), "Textual inversion", "embedding")
     roots.add(getattr(cmd, "hypernetwork_dir", None), "Hypernetworks", "hypernetwork")
 
@@ -58,6 +69,7 @@ def collect_roots(shared, paths, loaded: dict) -> HostRoots:
         roots.destinations["diffusion_model"] = dict(roots.destinations["checkpoint"])
         roots.add(models / "text_encoder", "Text encoder", "text_encoder")
         roots.add(getattr(cmd, "text_encoder_dir", None), "Text encoder (custom)", "text_encoder", True)
+        add_extra("text_encoder_dirs", "Text encoder", "text_encoder")
         roots.add(attr("modules_forge.shared", "controlnet_dir"), "ControlNet", "controlnet")
         roots.add(attr("modules_forge.shared", "preprocessor_dir"), "ControlNet preprocessor", "annotator")
     # The A1111 ControlNet extension exposes cn_models_dir; Forge exposes controlnet_dir.
@@ -69,6 +81,7 @@ def collect_roots(shared, paths, loaded: dict) -> HostRoots:
             roots.add(getattr(module, "controlnet_dir", None), "ControlNet", "controlnet")
     roots.add(shared.opts.data.get("control_net_models_path"), "ControlNet (settings)", "controlnet", True)
     roots.add(getattr(cmd, "controlnet_dir", None), "ControlNet (custom)", "controlnet", True)
+    add_extra("controlnet_dirs", "ControlNet", "controlnet")
 
     # Scalers carry their effective paths, including third-party and command-line ones.
     for item in getattr(shared, "sd_upscalers", []):

@@ -87,3 +87,49 @@ def test_complete_directory_merges_with_existing_custom_destination(host):
     assert entries[0]["kind"] is None and entries[0]["layout"] == "sd-webui"
     assert roots.default_library_root == entries[0]["id"]
     assert roots.destinations["checkpoint"] == {"root_id": entries[0]["id"], "rel_dir": ""}
+
+
+def test_forge_classic_extra_directories(host, tmp_path):
+    shared, paths = host
+    extra = {name: [tmp_path / f"{name}-1", tmp_path / f"{name}-2"] for name in ("ckpt", "lora", "vae", "te", "cn")}
+    for directories in extra.values():
+        directories[0].mkdir()
+    cmd = shared.cmd_opts
+    cmd.ckpt_dir = None
+    cmd.ckpt_dirs = [str(d) for d in extra["ckpt"]]
+    cmd.lora_dirs = [str(d) for d in extra["lora"]]
+    cmd.vae_dirs = [str(d) for d in extra["vae"]]
+    cmd.text_encoder_dirs = [str(d) for d in extra["te"]]
+    cmd.controlnet_dirs = [str(d) for d in extra["cn"]]
+    (tmp_path / "ckpt-3").mkdir()
+    cmd.ckpt_dirs.append(str(tmp_path / "ckpt-3"))
+    modules = {"modules_forge.shared": SimpleNamespace(controlnet_dir=tmp_path / "cn", preprocessor_dir=tmp_path / "annotators")}
+    roots = collect_roots(shared, paths, modules)
+    by_path = {r["path"]: r for r in roots.roots}
+    for name, kind in (("ckpt", "checkpoint"), ("lora", "lora"), ("vae", "vae"), ("te", "text_encoder"), ("cn", "controlnet")):
+        assert by_path[str(extra[name][0])]["kind"] == kind
+        # Missing directories are skipped, as the host skips them.
+        assert str(extra[name][1]) not in by_path
+        # Extra directories are scanned, never the download destination.
+        assert roots.destinations[kind]["root_id"] != by_path[str(extra[name][0])]["id"]
+    assert by_path[str(extra["ckpt"][0])]["name"] == "Checkpoint (extra)"
+    assert by_path[str(tmp_path / "ckpt-3")]["name"] == "Checkpoint (extra 2)"
+    assert destination_path(roots, "checkpoint") == str(Path(paths.models_path) / "Stable-diffusion")
+    assert destination_path(roots, "controlnet") == str(tmp_path / "cn")
+
+
+def test_forge_classic_extra_directory_shared_with_default_is_listed_once(host):
+    shared, paths = host
+    default = Path(paths.models_path) / "Stable-diffusion"
+    default.mkdir(parents=True)
+    shared.cmd_opts.ckpt_dirs = [str(default)]
+    roots = collect_roots(shared, paths, {})
+    entries = [r for r in roots.roots if r["path"] == str(default)]
+    assert len(entries) == 1 and entries[0]["name"] == "Checkpoint"
+
+
+def test_a1111_has_no_extra_directory_options(host):
+    shared, paths = host
+    assert not hasattr(shared.cmd_opts, "ckpt_dirs")
+    names = [r["name"] for r in collect_roots(shared, paths, {}).roots]
+    assert not any("(extra" in name for name in names)

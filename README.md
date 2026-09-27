@@ -28,7 +28,7 @@ Start or fully restart WebUI after installation. Dependencies will be installed 
 
 ## Usage
 
-1. Open the **Model Hub** tab. It opens the local library at **All model directories** by default; switch to a category directory when needed.
+1. Open the **Model Hub** tab. It opens the local library at **All folders** by default; switch to a single directory when needed.
 2. Search for models, select repository files, or enter a download URL in the embedded interface. Recognized model types suggest a matching destination; choose a directory manually for unrecognized files downloaded from direct links.
 3. By default, WebUI model lists refresh automatically after downloads finish or local models change. Refreshes wait until any active generation task finishes.
 
@@ -41,22 +41,26 @@ Opening the native interface separately also uses WebUI authentication. Keep a W
 
 The extension reads the host's runtime configuration instead of assuming that all models live in the default `models` folder.
 
-The local library's root selector includes **All model directories**, which points to the host's actual `models_path`.
-Reloading the extension interface always opens this directory, regardless of the previously selected category. After opening it, manually selected directories are not reset by background polling.
+The local library's root selector starts with **All folders**, which shows the folders of every model directory side by side, including extra directories outside `models`. A directory with model files at its top level, such as `models/Lora`, appears as one folder under its own name so its files stay together; same-named folders are labelled by their directory. The extension keeps it on, so its switch in Model Hub's settings is disabled.
+Reloading the extension interface always opens **All folders**, regardless of the previously selected directory. After opening it, manually selected directories are not reset by background polling.
+
+**All model directories** points to the host's actual `models_path`.
 Portable installations use the redirected model directory. This entry lets you browse all its subdirectories, including unregistered custom categories.
 Existing category entries and download destinations remain available. Custom model paths outside this root are still accessible through their own entries.
 
 | Model type | Directory source |
 | --- | --- |
-| Checkpoint | `sd_models.model_path` and `--ckpt-dir`; the custom directory takes priority for downloads |
-| VAE | Default VAE directory and `--vae-dir` |
-| LoRA / LyCORIS | `--lora-dir`, `--lyco-dir-backcompat` |
+| Checkpoint | `sd_models.model_path`, `--ckpt-dir` and Forge Classic's `--ckpt-dirs`; the custom directory takes priority for downloads |
+| VAE | Default VAE directory, `--vae-dir` and `--vae-dirs` |
+| LoRA / LyCORIS | `--lora-dir`, `--lyco-dir-backcompat` and `--lora-dirs` |
 | Embedding / Hypernetwork | `--embeddings-dir`, `--hypernetwork-dir` |
 | Forge diffusion model | Uses the Checkpoint download directory |
-| Forge text encoder | `models/text_encoder` and `--text-encoder-dir` |
-| ControlNet | Directories from loaded ControlNet / Forge modules, launch arguments, and additional directory settings |
+| Forge text encoder | `models/text_encoder`, `--text-encoder-dir` and `--text-encoder-dirs` |
+| ControlNet | Directories from loaded ControlNet / Forge modules, launch arguments (including `--controlnet-dirs`), and additional directory settings |
 | Forge preprocessor | Forge's actual preprocessor directory |
 | Upscaler | Model directories of registered upscalers and custom directories |
+
+Forge Classic's repeatable `--*-dirs` options, including the ones added by `--forge-ref-a1111-home`, `--forge-ref-comfy-home` and `--forge-ref-comfy-yaml`, appear as separate "(extra)" entries. Like the host, missing ones are skipped; they are scanned but never used as download destinations. Stable Diffusion WebUI (A1111) has no such options and is unaffected.
 
 Duplicate directories, including symbolic links to the same location, are merged. Directory IDs remain stable across restarts. The host manages the directory list, which is locked in Model Hub; fully restart WebUI after changing launch arguments or directory settings. Type hints do not override sd-model-hub's file identification results. Registering a directory does not mean the host can load every model architecture.
 

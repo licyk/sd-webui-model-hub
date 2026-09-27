@@ -6,14 +6,14 @@ import vm from "node:vm";
 const script = readFileSync(new URL("../javascript/model_hub.js", import.meta.url), "utf8");
 const settled = () => new Promise((resolve) => setImmediate(resolve));
 
-async function panel() {
+async function panel(overrides = {}) {
     let boot;
     let refreshes = 0;
     let sequence = 0;
     let httpStatus = 200;
     let failure = null;
     const timers = new Map();
-    const state = {instance: "server", revision: 0, busy: false, auto_refresh: true, ui_available: true, default_library_root: "all-models"};
+    const state = {instance: "server", revision: 0, busy: false, auto_refresh: true, ui_available: true, default_library_root: "all-models", combined_view: false, ...overrides};
     const status = {hidden: true, textContent: ""};
     const frame = {
         hidden: true,
@@ -75,6 +75,11 @@ test("connected panel shows the iframe without connection or folder information"
     assert.equal(ui.status.hidden, true);
     assert.equal(ui.status.textContent, "");
     assert.equal(ui.refreshes(), 0);
+});
+
+test("combined view opens the library on All folders", async () => {
+    const ui = await panel({combined_view: true});
+    assert.equal(ui.frame.src, "https://example.test/webui/sd-model-hub/#/library?root=*");
 });
 
 test("status polling preserves the directory chosen after opening the library", async () => {

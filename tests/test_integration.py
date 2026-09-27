@@ -184,3 +184,19 @@ def test_settings_persist_in_extension_data_directory(host, dist, tmp_path):
         assert resources.services.settings.settings.downloads.write_webui_metadata is True
     finally:
         resources.close()
+
+
+def test_combined_view_is_pinned_on(host, dist):
+    shared, paths = host
+    Path(shared.cmd_opts.lora_dir).mkdir(parents=True)
+    resources, app = create_factory(shared, paths, None, {})()
+    try:
+        with TestClient(app, base_url="http://localhost") as client:
+            assert client.get("/_host/status").json()["combined_view"] is True
+            assert "library.combined_view" in client.get("/api/v1/settings").json()["pinned"]
+            combined = client.get("/api/v1/library/combined/entries")
+            assert combined.status_code == 200, combined.text
+            client.patch("/api/v1/settings", json={"library": {"combined_view": False}})
+            assert client.get("/_host/status").json()["combined_view"] is True
+    finally:
+        resources.close()

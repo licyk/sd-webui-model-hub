@@ -77,6 +77,8 @@ def create_factory(shared, paths, demo, loaded=None):
             settings_overrides={
                 "paths": {"model_roots": roots.roots},
                 "downloads": {"kind_destinations": roots.destinations, "default_root": None},
+                # Same as ModelHubServer(combined_view=True): the Library opens on "All folders".
+                "library": {"combined_view": True},
                 "server": {"host": bound_host, "port": port, "access_token": None, "allowed_origins": [], "open_browser": False},
             },
         )
@@ -95,6 +97,7 @@ def create_factory(shared, paths, demo, loaded=None):
                         "host": "Forge" if "modules_forge.main_entry" in loaded or "modules_forge.shared" in loaded else "A1111",
                         "roots": roots.roots,
                         "default_library_root": roots.default_library_root,
+                        "combined_view": services.settings.settings.library.combined_view,
                         "ui_available": (web_dist_dir() / "index.html").is_file(),
                         "auto_refresh": bool(shared.opts.data.get("model_hub_auto_refresh", True)),
                         "busy": bool(getattr(state, "job_count", 0) > 0 or getattr(state, "job", "")),
