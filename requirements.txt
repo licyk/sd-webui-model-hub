@@ -1,2 +1,2 @@
-sd-model-hub>=0.1.15
+sd-model-hub>=0.1.16
 starlette

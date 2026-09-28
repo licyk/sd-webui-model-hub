@@ -2,7 +2,7 @@
 
 English | [简体中文](README_zh-CN.md)
 
-A model management and download extension for Stable Diffusion WebUI (A1111) and Forge, powered by sd-model-hub.
+A model management and download extension for Stable Diffusion WebUI (A1111) and Forge, powered by [sd-model-hub](https://github.com/licyk/sd-model-hub).
 
 The extension embeds the native sd-model-hub interface in the **Model Hub** tab. It supports searching model sources, downloading from direct links and Hugging Face / ModelScope repositories, managing download queues, and browsing, identifying, moving, renaming, and deleting local models. Available model sources and download capabilities are provided by sd-model-hub.
 
