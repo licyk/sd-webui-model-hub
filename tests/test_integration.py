@@ -12,12 +12,15 @@ from fastapi.testclient import TestClient
 from sd_model_hub.core.events.models import LibraryChangedEvent
 from starlette import _utils
 
+from sd_webui_model_hub.compat import annotated_parameters
 from sd_webui_model_hub.host import create_factory, mount_hub
 
 
 @pytest.fixture
 def dist(tmp_path, monkeypatch):
-    from sd_model_hub.api import app, static
+    # sd-model-hub declares its routes on import; on A1111's FastAPI that needs the shim, as in the host.
+    with annotated_parameters():
+        from sd_model_hub.api import app, static
 
     directory = tmp_path / "dist"
     (directory / "assets").mkdir(parents=True)

@@ -15,6 +15,7 @@ from starlette.routing import Mount, Route
 
 from sd_webui_model_hub import MOUNT_PATH, VERSION
 from sd_webui_model_hub.auth import HostAuth
+from sd_webui_model_hub.compat import annotated_parameters
 from sd_webui_model_hub.roots import collect_roots
 from sd_webui_model_hub.runtime import HubRuntime
 
@@ -85,7 +86,9 @@ def create_factory(shared, paths, demo, loaded=None):
     loaded = sys.modules if loaded is None else loaded
 
     def factory():
-        from sd_model_hub.api.app import create_app
+        # sd-model-hub declares its routes when its API modules are imported.
+        with annotated_parameters():
+            from sd_model_hub.api.app import create_app
         from sd_model_hub.api.paths import validate_public_base_url
         from sd_model_hub.api.static import web_dist_dir
         from sd_model_hub.core.context import build_services
@@ -111,7 +114,8 @@ def create_factory(shared, paths, demo, loaded=None):
         changes = Changes()
         unsubscribe = services.events.subscribe(changes.receive)
         try:
-            app = create_app(services, bound_host=bound_host, bound_port=port, extra_hosts=extra_hosts, public_base_url=public_url)
+            with annotated_parameters():
+                app = create_app(services, bound_host=bound_host, bound_port=port, extra_hosts=extra_hosts, public_base_url=public_url)
 
             async def status(_request):
                 state = getattr(shared, "state", None)
