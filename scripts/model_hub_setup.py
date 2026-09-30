@@ -4,7 +4,7 @@ import logging
 
 from modules import paths_internal, script_callbacks, shared
 
-from sd_webui_model_hub.host import mount_hub, on_ui_settings, on_ui_tabs
+from sd_webui_model_hub.host import access_urls, mount_hub, on_ui_settings, on_ui_tabs
 
 _runtime = None
 
@@ -15,6 +15,9 @@ def on_app_started(demo, app):
         _runtime = mount_hub(demo, app, shared, paths_internal)
     except Exception:
         logging.getLogger(__name__).exception("Could not mount SD Model Hub")
+        return
+    for url in access_urls(demo, shared):
+        print(f"SD WebUI Model Hub: {url}")
 
 
 def on_unloaded():
