@@ -14,4 +14,4 @@ def install_requirements(path: Path, run_pip) -> None:
         if is_package_installed(line):
             continue
         # The requirements file is shipped with the extension, not user input.
-        run_pip(f'install "{line}"', f"SD Model Hub: {line}")
+        run_pip(f'install "{line}"', f"Hanakura: {line}")

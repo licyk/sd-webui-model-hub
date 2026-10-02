@@ -2,9 +2,9 @@
 
 English | [简体中文](README_zh-CN.md)
 
-A model management and download extension for Stable Diffusion WebUI (A1111) and Forge, powered by [sd-model-hub](https://github.com/licyk/sd-model-hub).
+A model management and download extension for Stable Diffusion WebUI (A1111) and Forge, powered by [Hanakura](https://github.com/licyk/Hanakura).
 
-The extension embeds the native sd-model-hub interface in the **Model Hub** tab. It supports searching model sources, downloading from direct links and Hugging Face / ModelScope repositories, managing download queues, and browsing, identifying, moving, renaming, and deleting local models. Available model sources and download capabilities are provided by sd-model-hub.
+The extension embeds the native Hanakura interface in the **Model Hub** tab. It supports searching model sources, downloading from direct links and Hugging Face / ModelScope repositories, managing download queues, and browsing, identifying, moving, renaming, and deleting local models. Available model sources and download capabilities are provided by Hanakura.
 
 ## Installation
 
@@ -62,28 +62,28 @@ Existing category entries and download destinations remain available. Custom mod
 
 Forge Classic's repeatable `--*-dirs` options, including the ones added by `--forge-ref-a1111-home`, `--forge-ref-comfy-home` and `--forge-ref-comfy-yaml`, appear as separate "(extra)" entries. Like the host, missing ones are skipped; they are scanned but never used as download destinations. Stable Diffusion WebUI (A1111) has no such options and is unaffected.
 
-Duplicate directories, including symbolic links to the same location, are merged. Directory IDs remain stable across restarts. The host manages the directory list, which is locked in Model Hub; fully restart WebUI after changing launch arguments or directory settings. Type hints do not override sd-model-hub's file identification results. Registering a directory does not mean the host can load every model architecture.
+Duplicate directories, including symbolic links to the same location, are merged. Directory IDs remain stable across restarts. The host manages the directory list, which is locked in Model Hub; fully restart WebUI after changing launch arguments or directory settings. Type hints do not override Hanakura's file identification results. Registering a directory does not mean the host can load every model architecture.
 
-Extension data is stored in `data/` inside the extension directory, including `settings.toml`, the database, download history, and caches. This directory is excluded by `.gitignore`. Model files are saved directly to the model directories above. WebUI model sidecar metadata can be enabled in sd-model-hub's download settings.
+Extension data is stored in `data/` inside the extension directory, including `settings.toml`, the database, download history, and caches. This directory is excluded by `.gitignore`. Model files are saved directly to the model directories above. WebUI model sidecar metadata can be enabled in Hanakura's download settings.
 
 ## Settings and deployment
 
-WebUI **Settings → SD Model Hub** provides:
+WebUI **Settings → Hanakura** provides:
 
 - Automatic refresh of WebUI model lists after downloads finish or models change.
-- An external reverse proxy URL for OAuth, such as `https://example.com/webui/sd-model-hub`. It must include both the WebUI subpath and the extension path. Fully restart WebUI after changing it. OAuth client settings are still configured in sd-model-hub.
+- An external reverse proxy URL for OAuth, such as `https://example.com/webui/sd-model-hub`. It must include both the WebUI subpath and the extension path. Fully restart WebUI after changing it. OAuth client settings are still configured in Hanakura.
 
 The service runs under `/sd-model-hub/` on WebUI's existing HTTP server; it does not start a second HTTP server. When WebUI uses a subpath, the browser URL is `<WebUI subpath>/sd-model-hub/`. Reverse proxies must forward both HTTP and WebSocket traffic under this path.
 
-When Gradio login is enabled, the entire extension, including static pages, APIs, and WebSockets, validates the host session. Both Gradio 3 and 4 cookie formats are supported. No separate sd-model-hub token is required. API-only mode uses HTTP Basic authentication from `--api-auth`. The regular graphical interface uses Gradio login; `--api-auth` does not replace authentication for the graphical interface.
+When Gradio login is enabled, the entire extension, including static pages, APIs, and WebSockets, validates the host session. Both Gradio 3 and 4 cookie formats are supported. No separate Hanakura token is required. API-only mode uses HTTP Basic authentication from `--api-auth`. The regular graphical interface uses Gradio login; `--api-auth` does not replace authentication for the graphical interface.
 
-The extension grants the same file operation permissions as local model management and is intended for trusted WebUI users. Locked model roots control host directory configuration; they are not a filesystem sandbox. sd-model-hub itself allows explicit download paths and local imports.
+The extension grants the same file operation permissions as local model management and is intended for trusted WebUI users. Locked model roots control host directory configuration; they are not a filesystem sandbox. Hanakura itself allows explicit download paths and local imports.
 
 ## Development and validation
 
-`scripts/model_hub_setup.py` registers WebUI callbacks, `sd_webui_model_hub/` adapts the host, and `javascript/model_hub.js` handles the iframe and refresh controls. The extension does not modify host or sd-model-hub source files.
+`scripts/model_hub_setup.py` registers WebUI callbacks, `sd_webui_model_hub/` adapts the host, and `javascript/model_hub.js` handles the iframe and refresh controls. The extension does not modify host or Hanakura source files.
 
-After installing development dependencies, run these checks in an environment that can import sd-model-hub:
+After installing development dependencies, run these checks in an environment that can import Hanakura:
 
 ```bash
 python -m pytest -q
@@ -97,10 +97,10 @@ Tests cover directory mapping, both Gradio session formats, API-only authenticat
 
 The sub-application starts in WebUI's current event loop on the first authenticated request. Cleanup handles normal host shutdown, server event loop exit, and script unloading, including Forge's behavior of calling `on_app_started` after the server starts.
 
-Optional browser checks require Gradio 4, Playwright / Chromium, and a built sd-model-hub frontend. The test fixture uses temporary directories and does not load Stable Diffusion:
+Optional browser checks require Gradio 4, Playwright / Chromium, and a built Hanakura frontend. The test fixture uses temporary directories and does not load Stable Diffusion:
 
 ```bash
-PYTHONPATH=. python tests/browser_host.py --data-dir /tmp/model-hub-test --dist /path/to/sd_model_hub/webui/dist
+PYTHONPATH=. python tests/browser_host.py --data-dir /tmp/model-hub-test --dist /path/to/hanakura/webui/dist
 # Run in another terminal, then stop the fixture with Ctrl+C after checking:
 node tests/browser_smoke.mjs
 ```

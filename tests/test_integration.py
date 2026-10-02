@@ -9,7 +9,7 @@ import httpx
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from sd_model_hub.core.events.models import LibraryChangedEvent
+from hanakura.core.events.models import LibraryChangedEvent
 from starlette import _utils
 
 from sd_webui_model_hub.compat import annotated_parameters
@@ -18,9 +18,9 @@ from sd_webui_model_hub.host import create_factory, mount_hub
 
 @pytest.fixture
 def dist(tmp_path, monkeypatch):
-    # sd-model-hub declares its routes on import; on A1111's FastAPI that needs the shim, as in the host.
+    # Hanakura declares its routes on import; on A1111's FastAPI that needs the shim, as in the host.
     with annotated_parameters():
-        from sd_model_hub.api import app, static
+        from hanakura.api import app, static
 
     directory = tmp_path / "dist"
     (directory / "assets").mkdir(parents=True)
@@ -89,7 +89,7 @@ def test_mount_after_startup_prefix_auth_roots_socket_and_shutdown(host, dist):
 
 
 def test_real_download_to_custom_root_updates_host_revision(host, dist, monkeypatch):
-    from sd_model_hub.core import context
+    from hanakura.core import context
 
     shared, paths = host
     # A tiny, valid safetensors header is sufficient; no actual model or internet needed.
@@ -177,7 +177,7 @@ def test_settings_persist_in_extension_data_directory(host, dist, tmp_path):
             assert resources.services.settings.data_dir == data_dir
             assert resources.services.settings.path == data_dir / "settings.toml"
             assert (data_dir / "settings.toml").is_file()
-            assert (data_dir / "sd-model-hub.db").is_file()
+            assert (data_dir / "hanakura.db").is_file()
             assert not (Path(paths.data_path) / "model-hub").exists()
     finally:
         resources.close()

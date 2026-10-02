@@ -14,7 +14,7 @@ def on_app_started(demo, app):
     try:
         _runtime = mount_hub(demo, app, shared, paths_internal)
     except Exception:
-        logging.getLogger(__name__).exception("Could not mount SD Model Hub")
+        logging.getLogger(__name__).exception("Could not mount Hanakura")
         return
     for url in access_urls(demo, shared):
         print(f"SD WebUI Model Hub: {url}")

@@ -2,9 +2,9 @@
 
 [English](README.md) | 简体中文
 
-Stable Diffusion WebUI（A1111）和 Forge 的模型管理、下载扩展，由 [sd-model-hub](https://github.com/licyk/sd-model-hub) 驱动。
+Stable Diffusion WebUI（A1111）和 Forge 的模型管理、下载扩展，由 [Hanakura](https://github.com/licyk/Hanakura) 驱动。
 
-扩展在 **Model Hub** 标签页中嵌入 sd-model-hub 的原生界面，提供模型来源搜索、直链下载、Hugging Face / ModelScope 仓库下载、下载队列，以及本地模型浏览、识别、移动、重命名和删除。具体模型来源和下载能力由 sd-model-hub 提供。
+扩展在 **Model Hub** 标签页中嵌入 Hanakura 的原生界面，提供模型来源搜索、直链下载、Hugging Face / ModelScope 仓库下载、下载队列，以及本地模型浏览、识别、移动、重命名和删除。具体模型来源和下载能力由 Hanakura 提供。
 
 ## 安装
 
@@ -62,28 +62,28 @@ git clone https://github.com/licyk/sd-webui-model-hub.git extensions/sd-webui-mo
 
 Forge Classic 可重复指定的 `--*-dirs` 参数（包括 `--forge-ref-a1111-home`、`--forge-ref-comfy-home` 和 `--forge-ref-comfy-yaml` 展开的目录）会显示为单独的“(extra)”入口。与宿主一致，不存在的目录会被跳过；这些目录只用于浏览，不作为下载位置。Stable Diffusion WebUI（A1111）没有这些参数，不受影响。
 
-重复目录（包括指向同一位置的符号链接）合并，目录 ID 在重启后保持稳定。目录列表由宿主管理，在 Model Hub 中锁定；修改 WebUI 启动参数或目录配置后应完整重启。类型提示不会覆盖 sd-model-hub 的文件识别结果。目录接入不代表宿主能够加载任意模型架构。
+重复目录（包括指向同一位置的符号链接）合并，目录 ID 在重启后保持稳定。目录列表由宿主管理，在 Model Hub 中锁定；修改 WebUI 启动参数或目录配置后应完整重启。类型提示不会覆盖 Hanakura 的文件识别结果。目录接入不代表宿主能够加载任意模型架构。
 
-扩展数据保存在扩展目录下的 `data/`，包括 `settings.toml`、数据库、下载记录和缓存；该目录已通过 `.gitignore` 忽略。模型文件直接写入上述模型目录。是否生成 WebUI 模型侧车元数据可在 sd-model-hub 的下载设置中启用。
+扩展数据保存在扩展目录下的 `data/`，包括 `settings.toml`、数据库、下载记录和缓存；该目录已通过 `.gitignore` 忽略。模型文件直接写入上述模型目录。是否生成 WebUI 模型侧车元数据可在 Hanakura 的下载设置中启用。
 
 ## 设置与部署
 
-WebUI **Settings → SD Model Hub** 提供：
+WebUI **Settings → Hanakura** 提供：
 
 - 下载完成或模型变化后自动刷新 WebUI 模型列表。
-- 反向代理外部地址，用于 OAuth。例如 `https://example.com/webui/sd-model-hub`，必须包含 WebUI 子路径及扩展路径；修改后完整重启。OAuth 客户端配置仍在 sd-model-hub 中设置。
+- 反向代理外部地址，用于 OAuth。例如 `https://example.com/webui/sd-model-hub`，必须包含 WebUI 子路径及扩展路径；修改后完整重启。OAuth 客户端配置仍在 Hanakura 中设置。
 
 服务在 WebUI 原有 HTTP 服务的 `/sd-model-hub/` 下运行，不启动第二个 HTTP 服务。使用 WebUI 子路径时，浏览器地址为 `<WebUI 子路径>/sd-model-hub/`。反向代理需要同时转发该路径下的 HTTP 和 WebSocket。
 
-开启 Gradio 登录时，整个扩展（包括静态页面、API 和 WebSocket）校验宿主会话，兼容 Gradio 3 和 4 的 cookie 格式。不单独要求 sd-model-hub token。API-only 模式沿用 `--api-auth` 的 HTTP Basic 登录。普通图形界面模式使用 Gradio 登录，`--api-auth` 不替代图形界面的认证。
+开启 Gradio 登录时，整个扩展（包括静态页面、API 和 WebSocket）校验宿主会话，兼容 Gradio 3 和 4 的 cookie 格式。不单独要求 Hanakura token。API-only 模式沿用 `--api-auth` 的 HTTP Basic 登录。普通图形界面模式使用 Gradio 登录，`--api-auth` 不替代图形界面的认证。
 
-扩展提供与本机模型管理相同的文件操作权限，适合受信任的 WebUI 用户。锁定模型根目录仅用于宿主目录配置，不是文件系统沙箱；sd-model-hub 本身允许显式下载路径和本地导入。
+扩展提供与本机模型管理相同的文件操作权限，适合受信任的 WebUI 用户。锁定模型根目录仅用于宿主目录配置，不是文件系统沙箱；Hanakura 本身允许显式下载路径和本地导入。
 
 ## 开发与验证
 
-`scripts/model_hub_setup.py` 注册 WebUI 回调，`sd_webui_model_hub/` 负责宿主适配，`javascript/model_hub.js` 负责 iframe 和刷新控件。不会修改宿主或 sd-model-hub 源文件。
+`scripts/model_hub_setup.py` 注册 WebUI 回调，`sd_webui_model_hub/` 负责宿主适配，`javascript/model_hub.js` 负责 iframe 和刷新控件。不会修改宿主或 Hanakura 源文件。
 
-安装开发依赖后，在能导入 sd-model-hub 的环境运行：
+安装开发依赖后，在能导入 Hanakura 的环境运行：
 
 ```bash
 python -m pytest -q
@@ -97,10 +97,10 @@ node --test tests/test_panel.mjs
 
 子应用在首次已认证请求时，于 WebUI 当前事件循环中启动。标准宿主 shutdown、服务器事件循环退出和脚本卸载均有清理路径，以适配 Forge 在服务器启动后才调用 `on_app_started` 的时序。
 
-可选浏览器检查需要 Gradio 4、Playwright / Chromium 和已构建的 sd-model-hub 前端。测试夹具使用临时目录，不加载 Stable Diffusion：
+可选浏览器检查需要 Gradio 4、Playwright / Chromium 和已构建的 Hanakura 前端。测试夹具使用临时目录，不加载 Stable Diffusion：
 
 ```bash
-PYTHONPATH=. python tests/browser_host.py --data-dir /tmp/model-hub-test --dist /path/to/sd_model_hub/webui/dist
+PYTHONPATH=. python tests/browser_host.py --data-dir /tmp/model-hub-test --dist /path/to/hanakura/webui/dist
 # 在另一个终端运行，检查完成后用 Ctrl+C 停止夹具：
 node tests/browser_smoke.mjs
 ```

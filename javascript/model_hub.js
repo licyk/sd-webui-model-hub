@@ -66,7 +66,7 @@
                 const key = `${latest.instance}:${latest.revision}`;
                 if (!latest.ui_available) {
                     frame.hidden = true;
-                    message("sd-model-hub 缺少前端资源，请安装包含 webui/dist 的发行包；源码安装需先构建前端。");
+                    message("Hanakura 缺少前端资源，请安装包含 webui/dist 的发行包；源码安装需先构建前端。");
                     return;
                 }
                 if (!frame.hasAttribute("src")) {
@@ -84,7 +84,7 @@
                 if (refreshed === null && latest.revision === 0) refreshed = key;
                 if (latest.auto_refresh && refreshed !== key) refresh();
             } catch (error) {
-                if (!stopped) message(`无法连接 SD Model Hub（${error.message}），正在重试；启动错误请查看 WebUI 控制台。`);
+                if (!stopped) message(`无法连接 Hanakura（${error.message}），正在重试；启动错误请查看 WebUI 控制台。`);
             } finally {
                 clearTimeout(timeout);
                 inFlight = false;

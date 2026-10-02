@@ -1,6 +1,6 @@
 """Optional browser fixture: real Gradio, temporary models, no Stable Diffusion imports.
 
-Run with the host's Gradio installed and a built sd-model-hub dist directory.
+Run with the host's Gradio installed and a built Hanakura dist directory.
 The only login is smoke / smoke; this fixture binds exclusively to localhost.
 """
 
@@ -10,9 +10,9 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import gradio as gr
-from sd_model_hub.api import app as hub_app
-from sd_model_hub.api import static
-from sd_model_hub.core.events.models import LibraryChangedEvent
+from hanakura.api import app as hub_app
+from hanakura.api import static
+from hanakura.core.events.models import LibraryChangedEvent
 
 from sd_webui_model_hub import host as host_module
 from sd_webui_model_hub.host import mount_hub, on_ui_tabs

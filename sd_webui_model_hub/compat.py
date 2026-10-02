@@ -1,8 +1,8 @@
-"""Let FastAPI releases before 0.95 register sd-model-hub's routes.
+"""Let FastAPI releases before 0.95 register Hanakura's routes.
 
 Stable Diffusion WebUI (A1111) pins ``fastapi==0.94.0`` and reinstalls it on every launch, but
-sd-model-hub declares parameters as ``Annotated[T, Depends(...)]`` / ``Annotated[T, Query()]``, which
-FastAPI only reads from 0.95 on. While sd-model-hub builds its routes, those parameters are rewritten
+Hanakura declares parameters as ``Annotated[T, Depends(...)]`` / ``Annotated[T, Query()]``, which
+FastAPI only reads from 0.95 on. While Hanakura builds its routes, those parameters are rewritten
 into the older ``name: T = Depends(...)`` form. Routes are analysed once, when they are created, so
 the patch is removed afterwards and never touches the host's own routes.
 """

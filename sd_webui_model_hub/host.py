@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 
 if TYPE_CHECKING:
-    from sd_model_hub.core.context import Services
+    from hanakura.core.context import Services
 
 
 class Changes:
@@ -86,13 +86,13 @@ def create_factory(shared, paths, demo, loaded=None):
     loaded = sys.modules if loaded is None else loaded
 
     def factory():
-        # sd-model-hub declares its routes when its API modules are imported.
+        # Hanakura declares its routes when its API modules are imported.
         with annotated_parameters():
-            from sd_model_hub.api.app import create_app
-        from sd_model_hub.api.paths import validate_public_base_url
-        from sd_model_hub.api.static import web_dist_dir
-        from sd_model_hub.core.context import build_services
-        from sd_model_hub.version import VERSION as HUB_VERSION
+            from hanakura.api.app import create_app
+        from hanakura.api.paths import validate_public_base_url
+        from hanakura.api.static import web_dist_dir
+        from hanakura.core.context import build_services
+        from hanakura.version import VERSION as HUB_VERSION
 
         settings = shared.opts.data
         public_url = validate_public_base_url(settings.get("model_hub_public_url") or None)
@@ -106,7 +106,7 @@ def create_factory(shared, paths, demo, loaded=None):
             settings_overrides={
                 "paths": {"model_roots": roots.roots},
                 "downloads": {"kind_destinations": roots.destinations, "default_root": None},
-                # Same as ModelHubServer(combined_view=True): the Library opens on "All folders".
+                # Same as HanakuraServer(combined_view=True): the Library opens on "All folders".
                 "library": {"combined_view": True},
                 "server": {"host": bound_host, "port": port, "access_token": None, "allowed_origins": [], "open_browser": False},
             },
@@ -191,7 +191,7 @@ def mount_hub(demo, app, shared, paths):
 def on_ui_settings():
     from modules import shared
 
-    section = ("model_hub", "SD Model Hub")
+    section = ("model_hub", "Hanakura")
     shared.opts.add_option("model_hub_auto_refresh", shared.OptionInfo(True, "下载完成或本地模型改变后自动刷新 WebUI 模型列表", section=section))
     shared.opts.add_option(
         "model_hub_public_url",
@@ -206,7 +206,7 @@ def on_ui_tabs():
         gr.HTML(
             """<div id="sd-model-hub-panel">
   <p class="model-hub-status" role="status" aria-live="polite" hidden></p>
-  <iframe title="SD Model Hub 模型管理和下载" class="model-hub-frame" hidden></iframe>
+  <iframe title="Hanakura 模型管理和下载" class="model-hub-frame" hidden></iframe>
 </div>"""
         )
     return [(tab, "Model Hub", "sd_model_hub")]

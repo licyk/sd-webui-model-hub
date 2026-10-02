@@ -33,8 +33,8 @@ class HubRuntime:
             # whose custom lifespan does not call app.on_shutdown handlers.
             raise
         except Exception:
-            self.error = "SD Model Hub 启动失败，请查看 WebUI 控制台并重启 WebUI。"
-            logger.exception("SD Model Hub startup/lifespan failed")
+            self.error = "Hanakura 启动失败，请查看 WebUI 控制台并重启 WebUI。"
+            logger.exception("Hanakura startup/lifespan failed")
         finally:
             self.closed = True
             try:
@@ -74,7 +74,7 @@ class HubRuntime:
                 try:
                     future.result(timeout=30)
                 except TimeoutError:
-                    logger.warning("SD Model Hub is still stopping its downloads")
+                    logger.warning("Hanakura is still stopping its downloads")
         else:
             self.closed = True
 
@@ -84,7 +84,7 @@ class HubRuntime:
             if scope["type"] == "websocket":
                 await send({"type": "websocket.close", "code": 1011})
             else:
-                await JSONResponse({"detail": self.error or "SD Model Hub 已关闭，请刷新 WebUI。"}, status_code=503)(scope, receive, send)
+                await JSONResponse({"detail": self.error or "Hanakura 已关闭，请刷新 WebUI。"}, status_code=503)(scope, receive, send)
             return
         assert self.app is not None
         await self.app(scope, receive, send)

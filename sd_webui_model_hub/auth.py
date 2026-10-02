@@ -50,7 +50,7 @@ class HostAuth:
             if scope["type"] == "websocket":
                 await send({"type": "websocket.close", "code": 1008})
             else:
-                headers = {"WWW-Authenticate": 'Basic realm="SD Model Hub"'} if self.api_only and self.api_auth_configured else None
+                headers = {"WWW-Authenticate": 'Basic realm="Hanakura"'} if self.api_only and self.api_auth_configured else None
                 await JSONResponse({"detail": "WebUI login required"}, status_code=401, headers=headers)(scope, receive, send)
             return
         await self.app(scope, receive, send)
