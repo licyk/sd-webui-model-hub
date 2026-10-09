@@ -1,2 +1,2 @@
-hanakura>=0.1.4
+hanakura>=0.1.5
 starlette
